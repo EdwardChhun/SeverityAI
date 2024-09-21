@@ -1,0 +1,46 @@
+[
+    {
+        "id": 1,
+        "name": "John Doe",
+        "age": 45,
+        "symptoms": "Chest Pain",
+        "painLevel": "8",
+        "additionalInfo": "History of heart problems",
+        "severity": "5",
+        "explanation": "Heart attacks require immediate medical attention.",
+        "status": "seen"
+    },
+    {
+        "id": 2,
+        "name": "Dave Petrovikj",
+        "age": 32,
+        "symptoms": "Headache and nausea",
+        "painLevel": "4",
+        "additionalInfo": "No prior conditions",
+        "severity": "2",
+        "explanation": "Moderate condition.",
+        "status": "seen"
+    },
+    {
+        "id": 3,
+        "name": "Dave",
+        "age": "12",
+        "symptoms": "dsaads",
+        "painLevel": "2",
+        "additionalInfo": "dsadsa",
+        "severity": "3",
+        "explanation": "Moderate condition based on symptoms.",
+        "status": "seen"
+    },
+    {
+        "id": 4,
+        "name": "Dave",
+        "age": "21",
+        "symptoms": "i. have headache",
+        "painLevel": "4",
+        "additionalInfo": "too much coding",
+        "severity": "3",
+        "explanation": "Moderate condition based on symptoms.",
+        "status": "waiting"
+    }
+]
