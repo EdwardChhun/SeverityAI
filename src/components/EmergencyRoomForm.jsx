@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import './EmergencyRoomForm.css';
 import axios from 'axios';
 
 const EmergencyRoomForm = () => {
@@ -11,8 +10,10 @@ const EmergencyRoomForm = () => {
     additionalInfo: ''
   });
 
-  const [submitted, setSubmitted] = useState(false);
+  const [submitted, setSubmitted] = useState(false); // To track submission status
+  const [error, setError] = useState(null); // To handle errors
 
+  // Handle form changes
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prevData => ({
@@ -21,20 +22,22 @@ const EmergencyRoomForm = () => {
     }));
   };
 
+  // Handle form submission
   const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log(JSON.stringify(formData, null, 2));
-    setSubmitted(true);
+    e.preventDefault(); // Prevent page reload or redirect
+    setSubmitted(true); // Set form as submitted
+    setError(null); // Reset error state
+
+    // Submit data to the backend
     axios.post(import.meta.env.VITE_FLASK_END_POINT + '/patient-data', formData)
-        .then(response => {
-            // Handle successful response (optional)
-            console.log("Data submitted successfully:", response.data);
-        })
-        .catch(error => {
-            // Handle error response
-            console.error("Error submitting data:", error);
-        });
-}
+      .then(response => {
+        console.log("Data submitted successfully:", response.data);
+      })
+      .catch(error => {
+        console.error("Error submitting data:", error);
+        setError("There was an issue submitting your information. Please try again."); // Set error state
+      });
+  };
 
   return (
     <div className="form-container">
@@ -106,10 +109,18 @@ const EmergencyRoomForm = () => {
           <button type="submit" className="submit-button">Submit</button>
         </form>
       </div>
-      {submitted && (
+
+      {submitted && !error && (
         <div className="alert">
           <h3>Form Submitted</h3>
           <p>Your information has been recorded. A medical professional will assess your condition shortly.</p>
+        </div>
+      )}
+
+      {error && (
+        <div className="alert alert-error">
+          <h3>Submission Failed</h3>
+          <p>{error}</p>
         </div>
       )}
     </div>

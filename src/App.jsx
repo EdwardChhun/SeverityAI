@@ -1,31 +1,45 @@
-import React, { useState, useEffect } from 'react';
-import { useAuthInfo, useLogoutFunction, useRedirectFunctions } from '@propelauth/react';
-import EmergencyRoomForm from './components/EmergencyRoomForm';
+import React from 'react';
+import { useAuthInfo, useLogoutFunction } from '@propelauth/react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import './App.css';
+import AppRoutes from './routes';
 
 function App() {
-  const { isLoggedIn, user, isLoading } = useAuthInfo(); // Assuming `isLoading` is part of the auth info
-  const logout = useLogoutFunction();
-  const { redirectToLoginPage } = useRedirectFunctions();
-  const [submit, setSubmit] = useState(false);
+  const { isLoggedIn } = useAuthInfo(); // Check if the user is logged in
+  const logout = useLogoutFunction(); // Logout function from PropelAuth
+  const location = useLocation(); // Access current route
+  const navigate = useNavigate(); // For client-side navigation
 
-  // Optionally, handle loading state
-  if (isLoading) {
-    return <div>Loading...</div>; // Simple loading indicator
-  }
+  // Handle logout and redirect to "/home"
+  const handleLogout = () => {
+    logout(); // Log the user out
+    navigate('/home'); // Redirect to the home page after logout
+  };
+
+  // Handle redirect to "/" (login page) for doctors
+  const handleDoctorLogin = () => {
+    navigate('/'); // Navigate to "/" where sign-in will happen
+  };
 
   return (
     <div className="App">
       <header>
-        {isLoggedIn ? (
-          <EmergencyRoomForm />
-        ) : (
-          <div>Please log in to access the Emergency Room Form.</div>
+        {/* Render routes */}
+        <AppRoutes />
+
+        {/* Show the doctor login button on /home */}
+        {!isLoggedIn && location.pathname === '/home' && (
+          <button 
+            className="doctor-login-button" 
+            onClick={handleDoctorLogin} // Manual navigation to "/" for sign-in
+          >
+            Sign in as Doctor
+          </button>
         )}
-        {isLoggedIn ? (
-            <button onClick={logout}>Logout</button>
-        ) : (
-          <button onClick={redirectToLoginPage}>Login</button>
+
+        {/* Show logout button only when logged in and on /doctor-portal */}
+        {isLoggedIn && location.pathname === '/doctor-portal' && (
+          <button onClick={handleLogout}>Logout</button>
         )}
       </header>
     </div>
