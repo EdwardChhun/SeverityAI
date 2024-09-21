@@ -12,7 +12,7 @@ const EmergencyRoomForm = () => {
   });
 
   const [submitted, setSubmitted] = useState(false);
-
+  const [summary, setSummary] = useState("");
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prevData => ({
@@ -29,6 +29,8 @@ const EmergencyRoomForm = () => {
         .then(response => {
             // Handle successful response (optional)
             console.log("Data submitted successfully:", response.data);
+            console.log("Summary of patient" + response.data['Summary'][1]);
+            setSummary(response.data['Summary'][1]);
         })
         .catch(error => {
             // Handle error response
@@ -110,6 +112,8 @@ const EmergencyRoomForm = () => {
         <div className="alert">
           <h3>Form Submitted</h3>
           <p>Your information has been recorded. A medical professional will assess your condition shortly.</p>
+          <br/>
+          <p>Patient Summary: {summary}</p>
         </div>
       )}
     </div>

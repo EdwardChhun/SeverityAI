@@ -4,10 +4,10 @@ import EmergencyRoomForm from './components/EmergencyRoomForm';
 import './App.css';
 
 function App() {
-  const { isLoggedIn, user, isLoading } = useAuthInfo(); // Assuming `isLoading` is part of the auth info
+  const { isLoggedIn, isLoading } = useAuthInfo(); // Assuming `isLoading` is part of the auth info
   const logout = useLogoutFunction();
   const { redirectToLoginPage } = useRedirectFunctions();
-  const [submit, setSubmit] = useState(false);
+  const { isDoctor, setIsDoctor } = useState(false);
 
   // Optionally, handle loading state
   if (isLoading) {
