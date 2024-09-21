@@ -1,11 +1,11 @@
 .form-container {
     min-height: 100vh;
-    background-color: #e6f2ff;
+    /* background-color: #e6f2ff; */
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 20px;
+    padding: 5px;
     font-family: Arial, sans-serif;
   }
   

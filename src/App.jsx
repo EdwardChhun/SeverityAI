@@ -7,6 +7,7 @@ function App() {
   const { isLoggedIn, user, isLoading } = useAuthInfo(); // Assuming `isLoading` is part of the auth info
   const logout = useLogoutFunction();
   const { redirectToLoginPage } = useRedirectFunctions();
+  const [submit, setSubmit] = useState(false);
 
   // Optionally, handle loading state
   if (isLoading) {
@@ -17,19 +18,16 @@ function App() {
     <div className="App">
       <header>
         {isLoggedIn ? (
-          <>
-            <h1>Welcome, {user?.name}!</h1>
+          <EmergencyRoomForm />
+        ) : (
+          <div>Please log in to access the Emergency Room Form.</div>
+        )}
+        {isLoggedIn ? (
             <button onClick={logout}>Logout</button>
-          </>
         ) : (
           <button onClick={redirectToLoginPage}>Login</button>
         )}
       </header>
-      {isLoggedIn ? (
-        <EmergencyRoomForm />
-      ) : (
-        <div>Please log in to access the Emergency Room Form.</div>
-      )}
     </div>
   );
 }
