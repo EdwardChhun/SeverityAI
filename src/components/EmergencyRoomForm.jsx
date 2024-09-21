@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import './EmergencyRoomForm.css';
 import axios from 'axios';
+import ChatModal from './ChatModal'; // Ensure to import your ChatModal component
 
 const EmergencyRoomForm = () => {
   const [formData, setFormData] = useState({
@@ -13,6 +14,8 @@ const EmergencyRoomForm = () => {
 
   const [submitted, setSubmitted] = useState(false);
   const [summary, setSummary] = useState("");
+  const [isChatOpen, setChatOpen] = useState(false); // State to manage chat modal visibility
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prevData => ({
@@ -26,17 +29,25 @@ const EmergencyRoomForm = () => {
     console.log(JSON.stringify(formData, null, 2));
     setSubmitted(true);
     axios.post(import.meta.env.VITE_FLASK_END_POINT + '/patient-data', formData)
-        .then(response => {
-            // Handle successful response (optional)
-            console.log("Data submitted successfully:", response.data);
-            console.log("Summary of patient" + response.data['Summary'][1]);
-            setSummary(response.data['Summary'][1]);
-        })
-        .catch(error => {
-            // Handle error response
-            console.error("Error submitting data:", error);
-        });
-}
+      .then(response => {
+        // Handle successful response (optional)
+        console.log("Data submitted successfully:", response.data);
+        setSummary(response.data['Summary'][1]);
+        console.log("Summary: " + {summary});
+      })
+      .catch(error => {
+        // Handle error response
+        console.error("Error submitting data:", error);
+      });
+  };
+
+  const openChat = () => {
+    setChatOpen(true); // Function to open the chat modal
+  };
+
+  const closeChat = () => {
+    setChatOpen(false); // Function to close the chat modal
+  };
 
   return (
     <div className="form-container">
@@ -52,7 +63,7 @@ const EmergencyRoomForm = () => {
               id="name"
               name="name"
               type="text"
-              placeholder="John Doe"
+              placeholder="Full Name"
               value={formData.name}
               onChange={handleChange}
               required
@@ -64,7 +75,7 @@ const EmergencyRoomForm = () => {
               id="age"
               name="age"
               type="number"
-              placeholder="30"
+              placeholder="Age"
               value={formData.age}
               onChange={handleChange}
               required
@@ -82,14 +93,14 @@ const EmergencyRoomForm = () => {
             ></textarea>
           </div>
           <div className="form-group">
-            <label htmlFor="painLevel">Pain Level (1-10)</label>
+            <label htmlFor="painLevel">Pain Level (1-5)</label>
             <input
               id="painLevel"
               name="painLevel"
               type="number"
               min="1"
-              max="10"
-              placeholder="5"
+              max="5"
+              placeholder="..."
               value={formData.painLevel}
               onChange={handleChange}
               required
@@ -109,12 +120,26 @@ const EmergencyRoomForm = () => {
         </form>
       </div>
       {submitted && (
-        <div className="alert">
-          <h3>Form Submitted</h3>
-          <p>Your information has been recorded. A medical professional will assess your condition shortly.</p>
-          <br/>
-          <p>Patient Summary: {summary}</p>
-        </div>
+        <>
+          <div className="alert">
+            <h3>Form Submitted</h3>
+            <p>Your information has been recorded. A medical professional will assess your condition shortly.</p>
+            <br/>
+          </div>
+
+          <div className="alert-summary">
+            <h3>Patient Summary:</h3>
+            <p>{summary}</p>
+          </div>
+
+          <div className="alert">
+            <h3>Dr. Jay will reach out to you shortly. ETA: 6 mins</h3>
+            <button onClick={openChat}>Consult with a virtual assistant</button>
+          </div>
+
+          {/* Render the Chat Modal */}
+          <ChatModal isOpen={isChatOpen} onClose={closeChat} patientSummary={summary}/>
+        </>
       )}
     </div>
   );
