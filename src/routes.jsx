@@ -4,28 +4,39 @@ import EmergencyRoomForm from './components/EmergencyRoomForm';
 import DoctorsDashboard from './components/DoctorsDashboard';
 import { useAuthInfo, useRedirectFunctions } from '@propelauth/react';
 
+const ProtectedRoute = ({ children }) => {
+  const { isLoggedIn } = useAuthInfo();
+  const { redirectToLoginPage } = useRedirectFunctions();
+
+  if (!isLoggedIn) {
+    redirectToLoginPage({ returnTo: '/doctor-portal' });
+    return null;
+  }
+  return children;
+};
+
 const AppRoutes = () => {
-  const { isLoggedIn } = useAuthInfo(); // Check if the user is logged in
-  const { redirectToLoginPage } = useRedirectFunctions(); // Redirect to login page
+  const { isLoggedIn } = useAuthInfo();
 
   return (
     <Routes>
-      {/* Home page with the form (public route, accessible to everyone) */}
+      {/* Public route: Home page with the emergency room form */}
       <Route path="/home" element={<EmergencyRoomForm />} />
       
-      {/* Login page at "/", after login, redirect to /doctor-portal */}
-      <Route 
-        path="/" 
-        element={isLoggedIn ? <Navigate to="/doctor-portal" replace /> : <div>Sign In Page</div>} 
-      />
-
-      {/* Doctor's portal (protected) */}
+      {/* Protected route: Doctor's portal */}
       <Route 
         path="/doctor-portal" 
-        element={isLoggedIn ? <DoctorsDashboard /> : redirectToLoginPage({ returnTo: '/doctor-portal' })} 
+        element={
+          <ProtectedRoute>
+            <DoctorsDashboard />
+          </ProtectedRoute>
+        } 
       />
       
-      {/* Redirect any unknown routes to /home */}
+      {/* Root path now redirects to /home instead of triggering login */}
+      <Route path="/" element={<Navigate to="/home" replace />} />
+
+      {/* Catch-all: redirect any unknown routes to /home */}
       <Route path="*" element={<Navigate to="/home" replace />} />
     </Routes>
   );

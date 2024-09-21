@@ -3,8 +3,11 @@ from flask_cors import CORS
 from pymongo import MongoClient
 from cerebrasAPI import cerebrasINF
 from bson import ObjectId
+from cerebras.cloud.sdk import Cerebras
+from dotenv import load_dotenv
 import os
 
+load_dotenv()
 # Initialize the Flask app and enable CORS
 app = Flask(__name__)
 CORS(app)
@@ -21,6 +24,44 @@ def doctor_login():
     # Implement proper doctor authentication
     return jsonify({"message": "Doctor logged in successfully"})
 
+client = Cerebras(api_key=os.environ.get("CEREBRAS_API_KEY"))
+
+@app.route('/chat/initialize', methods=['POST'])
+def initialize_chat():
+    summary = request.json['summary']
+    
+    # Create a system message that includes the patient summary and instructions
+    system_message = f"""You are an AI assistant in an emergency room triage system. You have the following information about a patient: {summary} Based on this information, provide an initial message to the patient. Be empathetic, reassuring, and ask if they need any immediate assistance or have any questions. Do not provide medical advice or diagnosis. Respond initially with a short message that is concise and empathetic enough to prone the user to give up more information that could be important for doctors"""
+
+    # Generate the initial response using Cerebras
+    response = client.chat.completions.create(
+        messages=[
+            {"role": "system", "content": system_message},
+            {"role": "user", "content": "Please provide an initial message to the patient."}
+        ],
+        model="llama3.1-8b",
+        max_tokens=150
+    )
+    
+    initial_response = response.choices[0].message.content
+    return jsonify({'response': initial_response})
+
+@app.route('/chat', methods=['POST'])
+def chatbot():
+    user_message = request.json['message']
+    
+    # Create a chat completion using Cerebras
+    response = client.chat.completions.create(
+        messages=[
+            {"role": "system", "content": "You are a helpful assistant."},
+            {"role": "user", "content": user_message}
+        ],
+        model="llama3.1-8b",
+        max_tokens=150
+    )
+    
+    bot_response = response.choices[0].message.content
+    return jsonify({'response': bot_response})
 
 # API to submit new patient data
 @app.route('/patient-data', methods=['POST'])
@@ -42,20 +83,22 @@ def patient_data():
     severity = full_message[0]
     explanation = full_message[3:]
 
-    # Store patient data in MongoDB
-    patient = {
-        "name": data['name'],
-        "age": data['age'],
-        "symptoms": data['symptoms'],
-        "painLevel": data['painLevel'],
-        "additionalInfo": data['additionalInfo'],
-        "severity": severity,
-        "explanation": explanation,
-        "status": "waiting"
-    }
-    patients_collection.insert_one(patient)
+    # Make sure to have mongoDB working before 
+    
+    # # Store patient data in MongoDB
+    # patient = {
+    #     "name": data['name'],
+    #     "age": data['age'],
+    #     "symptoms": data['symptoms'],
+    #     "painLevel": data['painLevel'],
+    #     "additionalInfo": data['additionalInfo'],
+    #     "severity": severity,
+    #     "explanation": explanation,
+    #     "status": "waiting"
+    # }
+    # patients_collection.insert_one(patient)
 
-    return jsonify({"message": "Data received", "Summary": [severity, explanation]})
+    return jsonify({"message": "Data received", "Summary": [severity, explanation]}), 200
 
 
 # API to get live patient data for the doctor portal
