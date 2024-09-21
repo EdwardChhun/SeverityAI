@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import './EmergencyRoomForm.css';
+import axios from 'axios';
 
 const EmergencyRoomForm = () => {
   const [formData, setFormData] = useState({
@@ -24,7 +25,16 @@ const EmergencyRoomForm = () => {
     e.preventDefault();
     console.log(JSON.stringify(formData, null, 2));
     setSubmitted(true);
-  };
+    axios.post(import.meta.env.VITE_FLASK_END_POINT + '/patient-data', formData)
+        .then(response => {
+            // Handle successful response (optional)
+            console.log("Data submitted successfully:", response.data);
+        })
+        .catch(error => {
+            // Handle error response
+            console.error("Error submitting data:", error);
+        });
+}
 
   return (
     <div className="form-container">
