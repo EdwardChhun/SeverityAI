@@ -3,12 +3,8 @@ from flask_cors import CORS
 from propelauth_flask import init_auth, current_user
 from dotenv import load_dotenv
 import os
-
-load_dotenv()
 from cerebrasAPI import cerebrasINF
-from propelauth_flask import init_auth, current_user
-from dotenv import load_dotenv
-import os
+from cerebras.cloud.sdk import Cerebras
 
 load_dotenv()
 
@@ -38,8 +34,6 @@ def patient_data():
 
     return jsonify({"message": "Data received", "Summary": [severity,explanation]})
 
-if __name__ == '__main__':
-    app.run(debug=True)
 
 
 auth = init_auth(os.getenv("AUTH_URL"), os.getenv("AUTH_API_KEY"))
@@ -50,3 +44,24 @@ def who_am_i():
     """This route is protected, current_user is always set"""
     return {"user_id": current_user.user_id}
 
+client = Cerebras(api_key=os.environ.get("CEREBRAS_API_KEY"))
+
+@app.route('/chat', methods=['POST'])
+def chatbot():
+    user_message = request.json['message']
+    
+    # Create a chat completion using Cerebras
+    response = client.chat.completions.create(
+        messages=[
+            {"role": "system", "content": "You are a helpful assistant."},
+            {"role": "user", "content": user_message}
+        ],
+        model="llama3.1-8b",
+        max_tokens=150
+    )
+    
+    bot_response = response.choices[0].message.content
+    return jsonify({'response': bot_response})
+
+if __name__ == '__main__':
+    app.run(debug=True)
