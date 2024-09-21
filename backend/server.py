@@ -1,5 +1,10 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
+from propelauth_flask import init_auth, current_user
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
 from cerebrasAPI import cerebrasINF
 from propelauth_flask import init_auth, current_user
 from dotenv import load_dotenv
