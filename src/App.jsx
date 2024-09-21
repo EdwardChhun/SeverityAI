@@ -1,31 +1,51 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { useAuthInfo, useLogoutFunction, useRedirectFunctions } from '@propelauth/react';
-import EmergencyRoomForm from './components/EmergencyRoomForm';
+import { useLocation, useNavigate } from 'react-router-dom';
 import './App.css';
+import AppRoutes from './routes';
 
 function App() {
-  const { isLoggedIn, isLoading } = useAuthInfo(); // Assuming `isLoading` is part of the auth info
+
+  const { isLoggedIn, loading } = useAuthInfo();
   const logout = useLogoutFunction();
   const { redirectToLoginPage } = useRedirectFunctions();
-  // const { isDoctor, setIsDoctor } = useState(false);
+  const location = useLocation();
+  const navigate = useNavigate();
 
-  // Optionally, handle loading state
-  if (isLoading) {
-    return <div>Loading...</div>; // Simple loading indicator
+  const handleLogout = async () => {
+    try {
+      await logout();
+      // After successful logout, navigate to home
+      navigate('/home');
+    } catch (error) {
+      console.error('Logout failed:', error);
+    }
+  };
+
+  const handleDoctorLogin = () => {
+    redirectToLoginPage({ returnTo: '/doctor-portal' });
+  };
+
+  if (loading) {
+    return <div>Loading...</div>; // Or any loading indicator
   }
 
   return (
     <div className="App">
       <header>
-        {isLoggedIn ? (
-          <EmergencyRoomForm />
-        ) : (
-          <div>Please log in to access the Emergency Room Form.</div>
+        <AppRoutes />
+
+        {!isLoggedIn && location.pathname === '/home' && (
+          <button 
+            className="doctor-login-button" 
+            onClick={handleDoctorLogin}
+          >
+            Sign in as Doctor
+          </button>
         )}
-        {isLoggedIn ? (
-            <button onClick={logout}>Logout</button>
-        ) : (
-          <button onClick={redirectToLoginPage}>Login</button>
+
+        {isLoggedIn && location.pathname === '/doctor-portal' && (
+          <button onClick={handleLogout}>Logout</button>
         )}
       </header>
     </div>

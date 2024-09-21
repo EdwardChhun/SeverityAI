@@ -33,6 +33,7 @@ const EmergencyRoomForm = () => {
         // Handle successful response (optional)
         console.log("Data submitted successfully:", response.data);
         setSummary(response.data['Summary'][1]);
+        console.log("Summary: " + {summary});
       })
       .catch(error => {
         // Handle error response
@@ -137,7 +138,7 @@ const EmergencyRoomForm = () => {
           </div>
 
           {/* Render the Chat Modal */}
-          <ChatModal isOpen={isChatOpen} onClose={closeChat} />
+          <ChatModal isOpen={isChatOpen} onClose={closeChat} patientSummary={summary}/>
         </>
       )}
     </div>

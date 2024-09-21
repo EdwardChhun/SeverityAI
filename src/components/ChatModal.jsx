@@ -1,11 +1,26 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import PropTypes from 'prop-types';
-import './ChatModal.css'; // You'll need to create this CSS file
+import './ChatModal.css';
 
-const ChatModal = ({ isOpen, onClose }) => {
+const ChatModal = ({ isOpen, onClose, patientSummary }) => {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
+
+  useEffect(() => {
+    if (isOpen && patientSummary) {
+      initializeChat();
+    }
+  }, [isOpen, patientSummary]);
+
+  const initializeChat = async () => {
+    try {
+      const response = await axios.post(import.meta.env.VITE_FLASK_END_POINT + '/chat/initialize', { summary: patientSummary });
+      setMessages([{ text: response.data.response, user: false }]);
+    } catch (error) {
+      console.error('Error initializing chat:', error);
+    }
+  };
 
   const sendMessage = async () => {
     if (input.trim() === '') return;
@@ -15,7 +30,10 @@ const ChatModal = ({ isOpen, onClose }) => {
     setInput('');
 
     try {
-      const response = await axios.post(import.meta.env.VITE_FLASK_END_POINT + '/chat', { message: input });
+      const response = await axios.post(import.meta.env.VITE_FLASK_END_POINT + '/chat', { 
+        message: input,
+        summary: patientSummary // Include the summary in each message for context
+      });
       setMessages(prevMessages => [...prevMessages, { text: response.data.response, user: false }]);
     } catch (error) {
       console.error('Error sending message:', error);
@@ -51,9 +69,9 @@ const ChatModal = ({ isOpen, onClose }) => {
 };
 
 ChatModal.propTypes = {
-    isOpen: PropTypes.bool.isRequired, // isOpen should be a required boolean
-    onClose: PropTypes.func.isRequired, // onClose should be a required function
-  };
-
+  isOpen: PropTypes.bool.isRequired,
+  onClose: PropTypes.func.isRequired,
+  patientSummary: PropTypes.string.isRequired,
+};
 
 export default ChatModal;
