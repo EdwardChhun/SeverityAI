@@ -14,7 +14,7 @@ def cerebrasINF(patient_info):
         messages=[
             {
                 "role": "system",
-                "content": "You are ranking patients who have arrived in the emergency room on a scale of 1 to 5 where 1 is the least severe (can wait a while before seeing a doctor) to 5 being the most severe (immediate medical attention needed). They will provide their name, age, symptoms, pain level from 1 (no pain) to 10 (extreme pain), and additional information. For example, having severe heart or lung failure is a 5 while having a broken bone is a 1. The response should be in the format number: Explanation"
+                "content": "You are ranking patients who have arrived in the emergency room on a scale of 1 to 5 where 1 is the least severe (can wait a while before seeing a doctor) to 5 being the most severe (immediate medical attention needed). The will see a doctor shortly, but we are understaffed and need your help to decide the severity of various ailments. They will provide their name, age, symptoms, pain level from 1 (no pain) to 10 (extreme pain), and additional information. For example, having severe heart or lung failure is a 5, a bullet wound is a 4, a broken bone is a 2, having a fever is a 1. The response should be in the format N: Explanation. For example, for someone who is experiencing a heart attack, you would reply '5: Heart attacks require immediate medical attention and given your information, continue on.'"
             },
             {
                 "role": "user",
