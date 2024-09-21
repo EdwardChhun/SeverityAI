@@ -1,5 +1,10 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
+from propelauth_flask import init_auth, current_user
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
 
 app = Flask(__name__)
 CORS(app)  # This allows all origins by default
@@ -15,3 +20,13 @@ def patient_data():
 
 if __name__ == '__main__':
     app.run(debug=True)
+
+
+auth = init_auth(os.getenv("AUTH_URL"), os.getenv("AUTH_API_KEY"))
+
+@app.route("/api/whoami")
+@auth.require_user
+def who_am_i():
+    """This route is protected, current_user is always set"""
+    return {"user_id": current_user.user_id}
+
