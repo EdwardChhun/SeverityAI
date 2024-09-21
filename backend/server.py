@@ -7,6 +7,7 @@ from cerebras.cloud.sdk import Cerebras
 from dotenv import load_dotenv
 import os
 
+
 load_dotenv()
 # Initialize the Flask app and enable CORS
 app = Flask(__name__)
@@ -113,7 +114,6 @@ def get_patients():
         patient['_id'] = str(patient['_id'])
 
     return jsonify({"patients": sorted_patients})
-
 
 # API for doctor to mark patient as 'seen'
 @app.route('/mark-seen/<patient_id>', methods=['POST'])

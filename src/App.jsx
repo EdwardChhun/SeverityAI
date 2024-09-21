@@ -5,6 +5,7 @@ import './App.css';
 import AppRoutes from './routes';
 
 function App() {
+
   const { isLoggedIn, loading } = useAuthInfo();
   const logout = useLogoutFunction();
   const { redirectToLoginPage } = useRedirectFunctions();
