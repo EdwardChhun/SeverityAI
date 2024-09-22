@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import PropTypes from 'prop-types';
 import './ChatModal.css';
+import Notification from './Notification';
 
 const ChatModal = ({ isOpen, onClose, patientSummary }) => {
   const [messages, setMessages] = useState([]);
@@ -45,6 +46,7 @@ const ChatModal = ({ isOpen, onClose, patientSummary }) => {
   return (
     <div className="chat-modal">
       <div className="chat-container">
+        <Notification message ={"You're up next!, Booth #16"}/>
         <button className="close-button" onClick={onClose}>Close</button>
         <div className="chat-messages">
           {messages.map((message, index) => (
