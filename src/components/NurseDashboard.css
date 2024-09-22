@@ -1,0 +1,184 @@
+/* Nurse Dashboard Container */
+.nurse-dashboard-container {
+  padding: 20px;
+  background-color: #202020;
+  color: #f1f1f1;
+  font-family: Arial, sans-serif;
+}
+
+/* Top Bar: Centered Nurse Info and Larger Picture */
+.top-bar {
+  display: flex;
+  justify-content: center; /* Center nurse info */
+  align-items: center;
+  margin-bottom: 20px;
+  padding: 10px;
+  background-color: #333;
+  border-radius: 8px;
+  text-align: center; /* Ensure text is centered */
+}
+
+.nurse-info {
+  display: flex;
+  flex-direction: column; /* Stack photo and name/title vertically */
+  align-items: center; /* Center the content */
+}
+
+.nurse-photo {
+  border-radius: 50%;
+  width: 120px; /* Larger picture */
+  height: 120px;
+  margin-bottom: 15px; /* Space between photo and name */
+  border: 4px solid #007BFF; /* Blue border */
+}
+
+.nurse-info h2 {
+  font-size: 28px; /* Larger name */
+  margin: 0;
+}
+
+.nurse-info p {
+  font-size: 18px; /* Larger title */
+  margin: 0;
+  color: #f1f1f1;
+}
+
+/* Logout Button - Keep the same */
+.logout-button {
+  position: absolute; /* Move it out of the top-bar */
+  top: 20px;
+  right: 20px;
+  background-color: #ff4d4d;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.3s ease;
+}
+
+.logout-button:hover {
+  background-color: #e64545;
+}
+
+/* Search Input */
+.search-input {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 10px;
+  border: 1px solid #444;
+  border-radius: 5px;
+  background-color: #333;
+  color: white;
+  font-size: 14px;
+}
+
+/* Main Content: Patients and Available Doctors in Grid Layout */
+.main-content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;  /* Two equal columns */
+  gap: 20px;
+  padding: 20px;
+  background-color: #2c2c2c;
+  border-radius: 10px;
+}
+
+@media (max-width: 768px) {
+  .main-content {
+    grid-template-columns: 1fr; /* Stack columns on smaller screens */
+  }
+}
+
+/* Patients Section */
+.patients-section {
+  background-color: #333;
+  padding: 20px;
+  border-radius: 10px;
+}
+
+.patients-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.patients-table th, 
+.patients-table td {
+  padding: 12px;
+  border: 1px solid #444;
+  text-align: left;
+}
+
+.patients-table th {
+  background-color: #007BFF; /* Blue header */
+  color: white;
+}
+
+.assign-btn, 
+.reassign-btn {
+  background-color: #007BFF; /* Blue button */
+  color: white;
+  padding: 6px 12px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.assign-btn:hover, 
+.reassign-btn:hover {
+  background-color: #0056b3; /* Darker blue on hover */
+}
+
+.doctor-name-btn {
+  background: none;
+  color: #007BFF; /* Blue text */
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  text-decoration: underline;
+}
+
+/* Available Doctors Section */
+.available-doctors-section {
+  background-color: #333;
+  padding: 20px;
+  border-radius: 10px;
+}
+
+.doctors-list {
+  list-style: none;
+  padding: 0;
+}
+
+.doctors-list li {
+  margin-bottom: 10px;
+}
+
+.doctor-select-btn {
+  width: 100%;
+  padding: 10px;
+  background-color: #444;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  text-align: left;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.doctor-select-btn:hover {
+  background-color: #007BFF; /* Blue button on hover */
+}
+
+/* Fully Booked Doctors Styling */
+.doctor-fully-booked {
+  background-color: #ff4d4d; /* Red background for fully booked doctors */
+  cursor: not-allowed; /* Show not-allowed cursor */
+}
+
+.doctor-fully-booked:hover {
+  background-color: #ff4d4d; /* No hover effect for fully booked */
+}

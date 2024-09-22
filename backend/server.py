@@ -1,23 +1,11 @@
+import os
+import json
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-from pymongo import MongoClient
-from cerebrasAPI import cerebrasINF
-from bson import ObjectId
-from cerebras.cloud.sdk import Cerebras
-from dotenv import load_dotenv
-import os
+from cerebrasAPI import cerebrasAssignDoctor
 
-
-load_dotenv()
-# Initialize the Flask app and enable CORS
 app = Flask(__name__)
 CORS(app)
-
-# Initialize MongoDB client
-client = MongoClient(os.getenv("MONGODB_URI"))
-db = client['hospital_db']  # Specify the database
-patients_collection = db['patients']  # Specify the collection for patients
-seen_patients_collection = db['seen_patients']  # Collection for seen patients
 
 # Doctor authentication (ensure to handle properly in frontend)
 @app.route('/doctor-login', methods=['POST'])
@@ -79,77 +67,144 @@ def chatbot():
 # API to submit new patient data
 @app.route('/patient-data', methods=['POST'])
 def patient_data():
+# Paths to the JSON files
+PATIENTS_FILE = os.path.join(os.getcwd(), "patients.json")
+DOCTORS_FILE = os.path.join(os.getcwd(), "doctors.json")
+
+import logging
+
+# Setup logging configuration
+logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
+
+# Helper functions
+def load_json(file_path):
+    logging.debug(f"Loading data from {file_path}")
+    if not os.path.exists(file_path):
+        logging.warning(f"File {file_path} does not exist.")
+        return []
+    with open(file_path, "r") as file:
+        return json.load(file)
+
+def save_json(data, file_path):
+    logging.debug(f"Saving data to {file_path}")
+    with open(file_path, "w") as file:
+        json.dump(data, file, indent=4)
+
+def auto_assign_doctor(patient):
+    doctors = load_json(DOCTORS_FILE)
+
+    # Create a strict list of available doctors
+    doctors_info = ", ".join([f"Dr. {doc['name']} ({doc['specialty']}, {len(doc['assignedPatients'])}/2 patients)" for doc in doctors])
+
+    # Send patient info and doctor info to the AI
+    try:
+        ai_response = cerebrasAssignDoctor(f"Patient {patient['name']}, age {patient['age']} with symptoms: {patient['symptoms']} and a pain level of {patient['painLevel']}.", doctors_info)
+        severity = int(ai_response[0])  # Parse severity from response
+        explanation = ai_response.split('\n')[0][3:]  # Parse explanation
+        assigned_doctor_name = ai_response.split('Assigned Doctor: ')[1].strip()
+
+        # Find the recommended doctor by the AI in the list of doctors
+        assigned_doctor = next((doc for doc in doctors if doc['name'] == assigned_doctor_name), None)
+
+        if assigned_doctor and len(assigned_doctor.get('assignedPatients', [])) < 2:
+            # Assign the patient to the doctor
+            assigned_doctor['assignedPatients'].append(patient['id'])
+            patient['severity'] = severity
+            patient['explanation'] = explanation
+            patient['assignedDoctor'] = assigned_doctor['id']
+
+            # Save updated data
+            save_json(doctors, DOCTORS_FILE)
+            save_json(load_json(PATIENTS_FILE), PATIENTS_FILE)
+            return assigned_doctor
+        else:
+            return None
+    except Exception as e:
+        print(f"AI assignment failed: {e}")
+        return None
+
+
+# Automatically assign new patients when they are added
+@app.route('/add-patient', methods=['POST'])
+def add_patient():
     data = request.json
+    patients = load_json(PATIENTS_FILE)
 
-    # Construct data string to send to Cerebras
-    parsed_data = f"There is a new patient named {data['name']} who is {data['age']} years old. The person's symptoms are {data['symptoms']} and their pain level is {data['painLevel']}. Additional Info: {data['additionalInfo']}"
+    # Add the new patient to the list
+    new_patient = {
+        "id": str(len(patients) + 1),
+        "name": data['name'],
+        "age": data['age'],
+        "symptoms": data['symptoms'],
+        "painLevel": data['painLevel'],
+        "severity": None,
+        "explanation": None,
+        "assignedDoctor": None
+    }
+    patients.append(new_patient)
 
-    # Call Cerebras to analyze the data and return a severity score
-    llm_output = cerebrasINF(parsed_data)
-    output_message = []
-    for chunk in llm_output:
-        content = chunk.choices[0].delta.content
-        if content:
-            output_message.append(content)
+    # Auto-assign a doctor using AI
+    assigned_doctor = auto_assign_doctor(new_patient)
 
-    full_message = ''.join(output_message)
-    severity = full_message[0]
-    explanation = full_message[3:]
+    # Save the updated patient list
+    save_json(patients, PATIENTS_FILE)
 
-    # Make sure to have mongoDB working before 
-    
-    # # Store patient data in MongoDB
-    # patient = {
-    #     "name": data['name'],
-    #     "age": data['age'],
-    #     "symptoms": data['symptoms'],
-    #     "painLevel": data['painLevel'],
-    #     "additionalInfo": data['additionalInfo'],
-    #     "severity": severity,
-    #     "explanation": explanation,
-    #     "status": "waiting"
-    # }
-    # patients_collection.insert_one(patient)
-
-    return jsonify({"message": "Data received", "Summary": [severity, explanation]}), 200
-
-
-# API to get live patient data for the doctor portal
-@app.route('/patients', methods=['GET'])
-def get_patients():
-    # Get all patients with status 'waiting'
-    patients = list(patients_collection.find({"status": "waiting"}))
-    sorted_patients = sorted(patients, key=lambda p: int(p['severity']), reverse=True)
-
-    # Convert MongoDB _id (ObjectId) to string
-    for patient in sorted_patients:
-        patient['_id'] = str(patient['_id'])
-
-    return jsonify({"patients": sorted_patients})
-
-# API for doctor to mark patient as 'seen'
-@app.route('/mark-seen/<patient_id>', methods=['POST'])
-def mark_seen(patient_id):
-    # Find patient by ID and update status to 'seen'
-    patient = patients_collection.find_one({"_id": ObjectId(patient_id)})
-    if patient:
-        # Move patient to seen_patients collection
-        seen_patients_collection.insert_one(patient)
-        # Delete from patients collection
-        patients_collection.delete_one({"_id": ObjectId(patient_id)})
-        return jsonify({"message": "Patient marked as seen"})
+    if assigned_doctor:
+        return jsonify({"message": f"Patient assigned to Dr. {assigned_doctor['name']}"}), 200
     else:
-        return jsonify({"error": "Patient not found"}), 404
+        return jsonify({"message": "No doctors available at the moment"}), 200
 
+# Load doctors and patients
+@app.route('/load-data', methods=['GET'])
+def load_data():
+    patients = load_json(PATIENTS_FILE)
+    doctors = load_json(DOCTORS_FILE)
+    return jsonify({"patients": patients, "doctors": doctors})
+@app.route('/assign-patient', methods=['POST'])
+@app.route('/assign-patient', methods=['POST'])
+def assign_patient():
+    data = request.json
+    patient_id = data['patientId']
+    doctor_id = data['doctorId']  # Corrected key name
 
-# API to fetch seen patients
-@app.route('/seen-patients', methods=['GET'])
-def get_seen_patients():
-    seen_patients = list(seen_patients_collection.find())
-    for patient in seen_patients:
-        patient['_id'] = str(patient['_id'])
-    return jsonify({"seen_patients": seen_patients})
+    logging.debug(f"Assigning doctor {doctor_id} to patient {patient_id}")
 
+    # Load current data
+    patients = load_json(PATIENTS_FILE)
+    doctors = load_json(DOCTORS_FILE)
+
+    # Find the patient and doctor
+    patient = next((p for p in patients if p['id'] == patient_id), None)
+    doctor = next((d for d in doctors if d['id'] == doctor_id), None)
+
+    if patient and doctor:
+        # Check if the patient already has an assigned doctor
+        if patient['assignedDoctor']:
+            logging.debug(f"Patient {patient_id} already assigned to doctor {patient['assignedDoctor']}. Reassigning.")
+            # Remove the patient from the currently assigned doctor
+            current_doctor = next((d for d in doctors if d['id'] == patient['assignedDoctor']), None)
+            if current_doctor:
+                current_doctor['assignedPatients'].remove(patient_id)
+        
+        # Check if the new doctor is already assigned to 2 patients
+        if len(doctor['assignedPatients']) >= 2:
+            logging.warning(f"Doctor {doctor_id} is at capacity")
+            return jsonify({"error": "Doctor is at capacity"}), 400
+
+        # Assign patient to the new doctor
+        doctor['assignedPatients'].append(patient_id)
+        patient['assignedDoctor'] = doctor_id
+
+        logging.debug(f"Successfully assigned doctor {doctor_id} to patient {patient_id}")
+
+        # Save updated data
+        save_json(patients, PATIENTS_FILE)
+        save_json(doctors, DOCTORS_FILE)
+
+        return jsonify({"message": f"Patient reassigned to Dr. {doctor['name']}"}), 200
+    else:
+        logging.error(f"Patient {patient_id} or doctor {doctor_id} not found")
+        return jsonify({"error": "Patient or doctor not found"}), 404
 
 if __name__ == '__main__':
     app.run(debug=True)

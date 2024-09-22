@@ -1,0 +1,152 @@
+[
+    {
+        "id": "1",
+        "name": "John Doe",
+        "age": 45,
+        "symptoms": "Chest Pain",
+        "painLevel": 8,
+        "severity": 5,
+        "explanation": "Heart attacks require immediate medical attention.",
+        "assignedDoctor": "22"
+    },
+    {
+        "id": "2",
+        "name": "Jane Smith",
+        "age": 30,
+        "symptoms": "Fractured Arm",
+        "painLevel": 4,
+        "severity": 2,
+        "explanation": "Moderate urgency for bone fracture.",
+        "assignedDoctor": "22"
+    },
+    {
+        "id": "3",
+        "name": "Chris Johnson",
+        "age": 65,
+        "symptoms": "Breathing Issues",
+        "painLevel": 9,
+        "severity": 5,
+        "explanation": "Immediate medical attention needed for breathing difficulty.",
+        "assignedDoctor": "28"
+    },
+    {
+        "id": "4",
+        "name": "Anna Lee",
+        "age": 23,
+        "symptoms": "Severe Headache",
+        "painLevel": 7,
+        "severity": 4,
+        "explanation": "Possible neurological concern, requires evaluation.",
+        "assignedDoctor": "28"
+    },
+    {
+        "id": "5",
+        "name": "Mike Rogers",
+        "age": 54,
+        "symptoms": "Back Pain",
+        "painLevel": 5,
+        "severity": 3,
+        "explanation": "Moderate condition, pain relief required.",
+        "assignedDoctor": "3"
+    },
+    {
+        "id": "6",
+        "name": "Emily Wilson",
+        "age": 28,
+        "symptoms": "Fever and Cough",
+        "painLevel": 2,
+        "severity": 1,
+        "explanation": "Mild symptoms, possible viral infection.",
+        "assignedDoctor": "6"
+    },
+    {
+        "id": "7",
+        "name": "Dave Petrovik",
+        "age": 32,
+        "symptoms": "Headache and Nausea",
+        "painLevel": 4,
+        "severity": 2,
+        "explanation": "Moderate condition, requires further tests.",
+        "assignedDoctor": "3"
+    },
+    {
+        "id": "8",
+        "name": "Laura Bell",
+        "age": 19,
+        "symptoms": "Abdominal Pain",
+        "painLevel": 6,
+        "severity": 3,
+        "explanation": "Potential gastrointestinal issue, requires evaluation.",
+        "assignedDoctor": "5"
+    },
+    {
+        "id": "9",
+        "name": "George King",
+        "age": 72,
+        "symptoms": "Dizziness and Weakness",
+        "painLevel": 5,
+        "severity": 4,
+        "explanation": "Possible neurological or cardiovascular issue, urgent attention needed.",
+        "assignedDoctor": "2"
+    },
+    {
+        "id": "10",
+        "name": "Sophia Morris",
+        "age": 52,
+        "symptoms": "Shortness of Breath",
+        "painLevel": 7,
+        "severity": 5,
+        "explanation": "Critical condition, requires immediate attention.",
+        "assignedDoctor": "4"
+    },
+    {
+        "id": "11",
+        "name": "Frank Wilson",
+        "age": 38,
+        "symptoms": "Burn on Hand",
+        "painLevel": 6,
+        "severity": 3,
+        "explanation": "Moderate burn, requires burn care.",
+        "assignedDoctor": "8"
+    },
+    {
+        "id": "12",
+        "name": "Lisa Thompson",
+        "age": 27,
+        "symptoms": "Allergic Reaction",
+        "painLevel": 5,
+        "severity": 4,
+        "explanation": "Severe allergic reaction, immediate treatment required.",
+        "assignedDoctor": "7"
+    },
+    {
+        "id": "13",
+        "name": "Paul Young",
+        "age": 41,
+        "symptoms": "Leg Injury",
+        "painLevel": 4,
+        "severity": 2,
+        "explanation": "Minor leg injury, stable condition.",
+        "assignedDoctor": "5"
+    },
+    {
+        "id": "14",
+        "name": "Rachel Adams",
+        "age": 63,
+        "symptoms": "Vision Loss",
+        "painLevel": 3,
+        "severity": 4,
+        "explanation": "Possible retinal detachment, requires urgent evaluation.",
+        "assignedDoctor": "6"
+    },
+    {
+        "id": "15",
+        "name": "Mark Davis",
+        "age": 58,
+        "symptoms": "Severe Chest Pain and Sweating",
+        "painLevel": 9,
+        "severity": 5,
+        "explanation": "Possible myocardial infarction, immediate attention required.",
+        "assignedDoctor": "7"
+    }
+]
