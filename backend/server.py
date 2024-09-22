@@ -32,8 +32,8 @@ def initialize_chat():
     summary = request.json['summary']
     
     # Create a system message that includes the patient summary and instructions
-    system_message = f"""You are an AI assistant in an emergency room triage system. The patient is named {name} and is {age} years old. You have the following information about this patient: {summary}. Based on this information, provide an initial message to the patient. Be empathetic, reassuring, and ask if they need any immediate assistance or have any questions. Respond initially with a short message that is concise and empathetic enough to prone the user to give up more information that could be important for doctors. Feel free to include tips for minimizing pain while they are waiting for a doctor."""
-
+    system_message =  f"""You are an AI assistant in an emergency room triage system. You have the following information about a patient: {summary} Based on this information, provide an initial message to the patient. Be empathetic, reassuring, and ask if they need any immediate assistance or have any questions. Do not provide medical advice or diagnosis. Respond initially with a short message that is concise and empathetic enough to prone the user to give up more information that could be important for doctors"""
+    
     # Generate the initial response using Cerebras
     response = client.chat.completions.create(
         messages=[
