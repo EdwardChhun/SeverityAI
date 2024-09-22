@@ -133,7 +133,7 @@ const EmergencyRoomForm = () => {
           </div>
 
           <div className="alert">
-            <h3>Dr. Jay will reach out to you shortly. ETA: 6 mins</h3>
+            <h3>Dr. Jay will reach out to you shortly. ETA: 1 mins</h3>
             <button onClick={openChat}>Consult with a virtual assistant</button>
           </div>
 

@@ -48,6 +48,8 @@ function App() {
           <button onClick={handleLogout}>Logout</button>
         )}
       </header>
+
+      {/* <ExampleNotification /> */}
     </div>
   );
 }
