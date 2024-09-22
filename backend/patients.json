@@ -7,7 +7,7 @@
         "painLevel": 8,
         "severity": 5,
         "explanation": "Heart attacks require immediate medical attention.",
-        "assignedDoctor": "1"
+        "assignedDoctor": "26"
     },
     {
         "id": "2",
@@ -17,7 +17,7 @@
         "painLevel": 4,
         "severity": 2,
         "explanation": "Moderate urgency for bone fracture.",
-        "assignedDoctor": "4"
+        "assignedDoctor": "30"
     },
     {
         "id": "3",
@@ -27,7 +27,7 @@
         "painLevel": 9,
         "severity": 5,
         "explanation": "Immediate medical attention needed for breathing difficulty.",
-        "assignedDoctor": "1"
+        "assignedDoctor": "28"
     },
     {
         "id": "4",
@@ -37,7 +37,7 @@
         "painLevel": 7,
         "severity": 4,
         "explanation": "Possible neurological concern, requires evaluation.",
-        "assignedDoctor": "2"
+        "assignedDoctor": "28"
     },
     {
         "id": "5",

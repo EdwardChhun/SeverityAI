@@ -11,50 +11,58 @@ CORS(app)
 PATIENTS_FILE = os.path.join(os.getcwd(), "patients.json")
 DOCTORS_FILE = os.path.join(os.getcwd(), "doctors.json")
 
+import logging
+
+# Setup logging configuration
+logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
+
 # Helper functions
 def load_json(file_path):
+    logging.debug(f"Loading data from {file_path}")
     if not os.path.exists(file_path):
+        logging.warning(f"File {file_path} does not exist.")
         return []
     with open(file_path, "r") as file:
         return json.load(file)
 
 def save_json(data, file_path):
+    logging.debug(f"Saving data to {file_path}")
     with open(file_path, "w") as file:
         json.dump(data, file, indent=4)
 
-# Auto-assign a doctor based on AI evaluation
 def auto_assign_doctor(patient):
     doctors = load_json(DOCTORS_FILE)
 
-    # Prepare patient info for AI
-    patient_info = f"Patient {patient['name']}, age {patient['age']} with symptoms: {patient['symptoms']} and a pain level of {patient['painLevel']}."
-    
-    # Prepare doctor info for AI
+    # Create a strict list of available doctors
     doctors_info = ", ".join([f"Dr. {doc['name']} ({doc['specialty']}, {len(doc['assignedPatients'])}/2 patients)" for doc in doctors])
 
-    # Get AI's recommendation for severity and doctor assignment
-    ai_response = cerebrasAssignDoctor(patient_info, doctors_info)
-    
-    # Extract severity and doctor recommendation from AI response
-    severity = int(ai_response[0])  # Get severity as the first character (assuming it's a number)
-    explanation = ai_response.split('\n')[0][3:]  # Rest of the line after severity
-    assigned_doctor_name = ai_response.split('Assigned Doctor: ')[1].strip()
+    # Send patient info and doctor info to the AI
+    try:
+        ai_response = cerebrasAssignDoctor(f"Patient {patient['name']}, age {patient['age']} with symptoms: {patient['symptoms']} and a pain level of {patient['painLevel']}.", doctors_info)
+        severity = int(ai_response[0])  # Parse severity from response
+        explanation = ai_response.split('\n')[0][3:]  # Parse explanation
+        assigned_doctor_name = ai_response.split('Assigned Doctor: ')[1].strip()
 
-    # Find the doctor recommended by the AI
-    assigned_doctor = next((doc for doc in doctors if doc['name'] == assigned_doctor_name), None)
+        # Find the recommended doctor by the AI in the list of doctors
+        assigned_doctor = next((doc for doc in doctors if doc['name'] == assigned_doctor_name), None)
 
-    if assigned_doctor and len(assigned_doctor.get('assignedPatients', [])) < 2:
-        # Assign the patient to the doctor
-        assigned_doctor['assignedPatients'].append(patient['id'])
-        patient['severity'] = severity
-        patient['explanation'] = explanation
-        patient['assignedDoctor'] = assigned_doctor['id']
+        if assigned_doctor and len(assigned_doctor.get('assignedPatients', [])) < 2:
+            # Assign the patient to the doctor
+            assigned_doctor['assignedPatients'].append(patient['id'])
+            patient['severity'] = severity
+            patient['explanation'] = explanation
+            patient['assignedDoctor'] = assigned_doctor['id']
 
-        # Save the updated patient and doctor data
-        save_json(doctors, DOCTORS_FILE)
-        return assigned_doctor
-    else:
+            # Save updated data
+            save_json(doctors, DOCTORS_FILE)
+            save_json(load_json(PATIENTS_FILE), PATIENTS_FILE)
+            return assigned_doctor
+        else:
+            return None
+    except Exception as e:
+        print(f"AI assignment failed: {e}")
         return None
+
 
 # Automatically assign new patients when they are added
 @app.route('/add-patient', methods=['POST'])
@@ -92,13 +100,14 @@ def load_data():
     patients = load_json(PATIENTS_FILE)
     doctors = load_json(DOCTORS_FILE)
     return jsonify({"patients": patients, "doctors": doctors})
-
-# Reassign a patient to a different doctor manually (Nurse override)
+@app.route('/assign-patient', methods=['POST'])
 @app.route('/assign-patient', methods=['POST'])
 def assign_patient():
     data = request.json
     patient_id = data['patientId']
-    doctor_id = data['DoctorId']
+    doctor_id = data['doctorId']  # Corrected key name
+
+    logging.debug(f"Assigning doctor {doctor_id} to patient {patient_id}")
 
     # Load current data
     patients = load_json(PATIENTS_FILE)
@@ -109,20 +118,32 @@ def assign_patient():
     doctor = next((d for d in doctors if d['id'] == doctor_id), None)
 
     if patient and doctor:
-        # Check if the doctor is already assigned to 2 patients
+        # Check if the patient already has an assigned doctor
+        if patient['assignedDoctor']:
+            logging.debug(f"Patient {patient_id} already assigned to doctor {patient['assignedDoctor']}. Reassigning.")
+            # Remove the patient from the currently assigned doctor
+            current_doctor = next((d for d in doctors if d['id'] == patient['assignedDoctor']), None)
+            if current_doctor:
+                current_doctor['assignedPatients'].remove(patient_id)
+        
+        # Check if the new doctor is already assigned to 2 patients
         if len(doctor['assignedPatients']) >= 2:
+            logging.warning(f"Doctor {doctor_id} is at capacity")
             return jsonify({"error": "Doctor is at capacity"}), 400
 
-        # Assign patient to doctor
+        # Assign patient to the new doctor
         doctor['assignedPatients'].append(patient_id)
         patient['assignedDoctor'] = doctor_id
+
+        logging.debug(f"Successfully assigned doctor {doctor_id} to patient {patient_id}")
 
         # Save updated data
         save_json(patients, PATIENTS_FILE)
         save_json(doctors, DOCTORS_FILE)
 
-        return jsonify({"message": "Patient reassigned to doctor"}), 200
+        return jsonify({"message": f"Patient reassigned to Dr. {doctor['name']}"}), 200
     else:
+        logging.error(f"Patient {patient_id} or doctor {doctor_id} not found")
         return jsonify({"error": "Patient or doctor not found"}), 404
 
 if __name__ == '__main__':

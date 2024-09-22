@@ -1,0 +1,61 @@
+ /* Modal Overlay */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+  
+  /* Modal Content */
+  .modal-content {
+    background-color: #2c2c2c;
+    padding: 20px;
+    border-radius: 8px;
+    width: 400px;
+    text-align: center;
+    color: #f1f1f1;
+  }
+  
+  .modal-content h2 {
+    margin-bottom: 15px;
+    color: #4CAF50;
+  }
+  
+  .modal-content p {
+    margin: 10px 0;
+  }
+  
+  .modal-content ul {
+    list-style: none;
+    padding: 0;
+  }
+  
+  .modal-content ul li {
+    background-color: #444;
+    padding: 8px;
+    margin: 5px 0;
+    border-radius: 4px;
+  }
+  
+  .close-btn {
+    background-color: #ff4d4d;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s ease;
+    margin-top: 15px;
+  }
+  
+  .close-btn:hover {
+    background-color: #e64545;
+  }
+  

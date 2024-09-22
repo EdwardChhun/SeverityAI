@@ -1,57 +1,57 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import './NurseDashboard.css';
+import DoctorProfileModal from './DoctorProfileModal';
 
 const NurseDashboard = () => {
   const [patients, setPatients] = useState([]);
   const [doctors, setDoctors] = useState([]);
   const [selectedDoctor, setSelectedDoctor] = useState(null);
+  const [loading, setLoading] = useState(true); // Loading state
   const [nurseInfo] = useState({
     name: "Nurse Sarah Johnson",
     specialty: "General Medicine",
   });
+  const [showDoctorProfile, setShowDoctorProfile] = useState(false); // For modal visibility
 
   // Load patient and doctor data
   const fetchData = async () => {
     try {
+      console.log("Fetching data from backend...");
       const response = await axios.get('http://127.0.0.1:5000/load-data');
-      const fetchedPatients = response.data.patients || [];
-      const fetchedDoctors = response.data.doctors || [];
-
-      // Auto-assign patients on fetch
-      autoAssignPatients(fetchedPatients, fetchedDoctors);
-
-      setPatients(fetchedPatients);
-      setDoctors(fetchedDoctors);
+      console.log("Fetched data: ", response.data);
+      setPatients(response.data.patients || []);
+      setDoctors(response.data.doctors || []);
+      setLoading(false);  // Set loading to false after data is fetched
     } catch (error) {
       console.error('Error loading data:', error);
+      setLoading(false);
     }
   };
 
-  // Auto-assign logic based on severity and doctor availability
-  const autoAssignPatients = (patientsList, doctorsList) => {
-    patientsList.forEach(patient => {
-      // If patient is unassigned, auto-assign if a doctor is available
-      if (!patient.assignedDoctor) {
-        const availableDoctor = doctorsList.find(doctor => doctor.assignedPatients.length < 2);
-        if (availableDoctor) {
-          handleAssignPatient(patient.id, availableDoctor.id);
-        }
-      }
-    });
+  const handleDoctorClick = (doctorId) => {
+    const doctor = doctors.find(doc => doc.id === doctorId);
+    if (doctor) {
+      console.log("Selected Doctor: ", doctor);
+      setSelectedDoctor(doctor);
+      setShowDoctorProfile(true);  // Show doctor profile modal
+    } else {
+      console.error(`Doctor with ID ${doctorId} not found!`);
+    }
   };
 
-  // Assign a patient to a doctor
   const handleAssignPatient = async (patientId, doctorId) => {
     if (!doctorId) {
-      console.error('No doctor selected.');
+      console.error('No doctor selected!');
       return;
     }
 
     try {
+      console.log(`Assigning patient ${patientId} to doctor ${doctorId}`);
       const response = await axios.post('http://127.0.0.1:5000/assign-patient', { patientId, doctorId });
       if (response.status === 200) {
-        fetchData();  // Reload data after assigning
+        console.log("Patient assigned successfully");
+        fetchData(); // Reload data
       } else {
         console.error('Error assigning patient:', response.data.error);
       }
@@ -61,15 +61,21 @@ const NurseDashboard = () => {
   };
 
   useEffect(() => {
-    fetchData();
+    const loadData = async () => {
+      await fetchData();
+    };
+    loadData();
   }, []);
+
+  // Show a loading message or spinner
+  if (loading) return <div>Loading...</div>;
 
   return (
     <div className="nurse-dashboard-container">
       {/* Nurse Info */}
       <div className="top-bar">
         <div className="nurse-info">
-          <img src="src/components/nurse.png" alt="Nurse" className="nurse-photo" />
+          <img src="./nurse.png" alt="Nurse" className="nurse-photo" />
           <div>
             <h2>{nurseInfo.name}</h2>
             <p>Specialty: {nurseInfo.specialty}</p>
@@ -105,31 +111,24 @@ const NurseDashboard = () => {
                   <td>{patient.painLevel}</td>
                   <td>{patient.severity}</td>
                   <td>{patient.explanation}</td>
-                  <td>{patient.assignedDoctor ? `Dr. ${doctors.find(d => d.id === patient.assignedDoctor)?.name}` : 'Unassigned'}</td>
                   <td>
-                    {!patient.assignedDoctor ? (
-                      <select
-                        onChange={(e) => {setSelectedDoctor(e.target.value); console.log(e.target.value)}} // Set the selected doctor
-                        value={selectedDoctor || ""}
-                        className="doctor-select"
-                      >
-                        <option value="" disabled>Select a Doctor</option>
-                        {doctors
-                          .filter(doctor => doctor.assignedPatients.length < 2)
-                          .map((doctor) => (
-                            <option key={doctor.id} value={doctor.id}>
-                              Dr. {doctor.name} - {doctor.specialty}
-                            </option>
-                          ))}
-                      </select>
+                    {patient.assignedDoctor ? (
+                      <>
+                        Dr. {doctors.find(d => d.id === patient.assignedDoctor)?.name || "Unknown"}
+                      </>
                     ) : (
-                      <button
-                        className="reassign-btn"
-                        onClick={() => handleAssignPatient(patient.id, selectedDoctor)} // Assign the selected doctor
-                      >
-                        Assign Doctor
-                      </button>
+                      'Unassigned'
                     )}
+                  </td>
+                  <td>
+                    {/* Allow reassignment regardless of whether a doctor is assigned */}
+                    <button 
+                      className="assign-btn" 
+                      onClick={() => handleAssignPatient(patient.id, selectedDoctor?.id)}  // Ensure selectedDoctor has an id
+                      disabled={!selectedDoctor}  // Disable if no doctor is selected
+                    >
+                      {patient.assignedDoctor ? 'Reassign Doctor' : 'Assign Doctor'}
+                    </button>
                   </td>
                 </tr>
               ))}
@@ -142,16 +141,30 @@ const NurseDashboard = () => {
           <h3>Available Doctors</h3>
           <ul className="doctors-list">
             {doctors
-              .filter(doctor => doctor?.assignedPatients?.length < 2)
+              .filter(doctor => doctor?.assignedPatients?.length < 2)  // Only show available doctors
               .map((doctor) => (
                 <li key={doctor.id}>
-                  <button className="doctor-select-btn">
+                  <button 
+                    className="doctor-select-btn" 
+                    onClick={() => {
+                      setSelectedDoctor(doctor);  // Correctly set the selected doctor here
+                      handleDoctorClick(doctor.id);
+                    }}
+                  >
                     {doctor.name} - {doctor.specialty} ({doctor.assignedPatients?.length || 0}/2)
                   </button>
                 </li>
               ))}
           </ul>
         </div>
+
+        {/* Doctor Profile Modal */}
+        {showDoctorProfile && selectedDoctor && (
+          <DoctorProfileModal 
+            doctor={selectedDoctor} 
+            onClose={() => setShowDoctorProfile(false)}
+          />
+        )}
       </div>
     </div>
   );
