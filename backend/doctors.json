@@ -70,7 +70,10 @@
         "id": "22",
         "name": "Dr. Paul Walker",
         "specialty": "Plastic Surgeon",
-        "assignedPatients": []
+        "assignedPatients": [
+            "1",
+            "2"
+        ]
     },
     {
         "id": "23",
@@ -94,9 +97,7 @@
         "id": "26",
         "name": "Dr. David Collins",
         "specialty": "Neurosurgeon",
-        "assignedPatients": [
-            "1"
-        ]
+        "assignedPatients": []
     },
     {
         "id": "27",
@@ -123,8 +124,6 @@
         "id": "30",
         "name": "Dr. Brian Hill",
         "specialty": "Family Medicine",
-        "assignedPatients": [
-            "2"
-        ]
+        "assignedPatients": []
     }
 ]
