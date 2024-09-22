@@ -83,6 +83,9 @@ const NurseDashboard = () => {
     setFilteredPatients(filtered);
   };
 
+  // Sort patients by severity in descending order
+  const sortedPatients = filteredPatients.sort((a, b) => b.severity - a.severity);
+
   return (
     <div className="nurse-dashboard-container">
       {/* Nurse Info */}
@@ -94,14 +97,14 @@ const NurseDashboard = () => {
             <p>Specialty: {nurseInfo.specialty}</p>
           </div>
         </div>
-        <button className="logout-button">Logout</button>
+        {/* <button className="logout-button">Logout</button> */}
       </div>
 
       {/* Main Content */}
       <div className="main-content">
         {/* Patients Section */}
         <div className="patients-section">
-          <h3>Live Cases (Sorted by Priority)</h3>
+          <h3>Live Cases (Sorted by Severity)</h3>
 
           {/* Search Patients */}
           <input
@@ -126,7 +129,7 @@ const NurseDashboard = () => {
               </tr>
             </thead>
             <tbody>
-              {filteredPatients.map((patient) => (
+              {sortedPatients.map((patient) => (
                 <tr key={patient.id}>
                   <td>{patient.name}</td>
                   <td>{patient.age}</td>

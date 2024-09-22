@@ -3,7 +3,9 @@
         "id": "1",
         "name": "Dr. Alice Brown",
         "specialty": "General Practitioner",
-        "assignedPatients": []
+        "assignedPatients": [
+            "1"
+        ]
     },
     {
         "id": "2",
@@ -71,7 +73,6 @@
         "name": "Dr. Paul Walker",
         "specialty": "Plastic Surgeon",
         "assignedPatients": [
-            "1",
             "2"
         ]
     },

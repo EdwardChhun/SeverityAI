@@ -7,7 +7,7 @@
         "painLevel": 8,
         "severity": 5,
         "explanation": "Heart attacks require immediate medical attention.",
-        "assignedDoctor": "22"
+        "assignedDoctor": "1"
     },
     {
         "id": "2",
