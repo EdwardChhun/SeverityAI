@@ -50,11 +50,23 @@ def initialize_chat():
 @app.route('/chat', methods=['POST'])
 def chatbot():
     user_message = request.json['message']
+    patient_summary = request.json.get('summary', '')  # Get the summary if provided
     
+    # Create a system message that includes the patient summary
+    system_message = f"""You are an AI assistant in an emergency room triage system. 
+    You have the following information about a patient:
+
+    {patient_summary}
+
+    Provide empathetic and helpful responses to the patient's questions or concerns. 
+    Do not provide medical advice or diagnosis. If the patient's condition seems to 
+    worsen or they report new severe symptoms, advise them to immediately notify the medical staff. 
+    Do not use bold letters in your responses."""
+
     # Create a chat completion using Cerebras
     response = client.chat.completions.create(
         messages=[
-            {"role": "system", "content": "You are a helpful assistant, do not include bold letters."},
+            {"role": "system", "content": system_message},
             {"role": "user", "content": user_message}
         ],
         model="llama3.1-8b",

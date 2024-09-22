@@ -47,7 +47,7 @@ const ChatModal = ({ isOpen, onClose, patientSummary }) => {
     <div className="chat-modal">
       <div className="chat-container">
         <Notification message ={"You're up next!, Booth #16"}/>
-        <button className="close-button" onClick={onClose}>X</button>
+        <button className="close-button" onClick={onClose}>x</button>
         <div className="chat-messages">
           {messages.map((message, index) => (
             <div key={index} className={`message ${message.user ? 'user' : 'bot'}`}>
