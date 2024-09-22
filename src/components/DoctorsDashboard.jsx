@@ -95,8 +95,6 @@ const DoctorsDashboard = () => {
           ))}
         </tbody>
       </table>
-
-      <button onClick={() => console.log("Logout clicked")}>Logout</button>
     </div>
   );
 };
