@@ -2,109 +2,135 @@ import os
 import json
 from flask import Flask, request, jsonify
 from flask_cors import CORS
+from cerebrasAPI import cerebrasINF
 
 # Initialize the Flask app and enable CORS
 app = Flask(__name__)
 CORS(app)
 
-# Path to the JSON file
-JSON_FILE_PATH = os.path.join(os.getcwd(), "patients.json")
+# Path to the JSON files
+PATIENTS_FILE = os.path.join(os.getcwd(), "patients.json")
+DOCTORS_FILE = os.path.join(os.getcwd(), "doctors.json")
 
-
-# Helper functions to interact with JSON file
-def load_patients():
-    """Load the patients from the JSON file."""
-    if not os.path.exists(JSON_FILE_PATH):
+# Helper functions to interact with JSON files
+def load_json(file_path):
+    if not os.path.exists(file_path):
         return []
-    with open(JSON_FILE_PATH, "r") as file:
+    with open(file_path, "r") as file:
         return json.load(file)
 
+def save_json(data, file_path):
+    with open(file_path, "w") as file:
+        json.dump(data, file, indent=4)
 
-def save_patients(patients):
-    """Save the patients to the JSON file."""
-    with open(JSON_FILE_PATH, "w") as file:
-        json.dump(patients, file, indent=4)
+# Auto-assign a patient based on AI evaluation
+def auto_assign_doctor(patient):
+    doctors = load_json(DOCTORS_FILE)
 
+    # Get the patient details as input for the AI
+    patient_info = f"There is a patient named {patient['name']} who is {patient['age']} years old. They are experiencing {patient['symptoms']} with a pain level of {patient['painLevel']}."
 
-# API to submit new patient data
-@app.route('/patient-data', methods=['POST'])
-def patient_data():
+    # Call the AI to rank severity
+    ai_response = cerebrasINF(patient_info)
+    
+    output_message = []
+    for chunk in ai_response:
+        content = chunk.choices[0].delta.content
+        if content:
+            output_message.append(content)
+    
+    full_message = ''.join(output_message)
+    severity = int(full_message[0])  # Extract the severity score
+    explanation = full_message[3:]
+
+    # Find an available doctor in the doctors.json list
+    available_doctors = [doc for doc in doctors if len(doc.get('assignedPatients', [])) < 2]
+
+    if available_doctors:
+        # Auto-assign the first available doctor in the list
+        assigned_doctor = available_doctors[0]
+        assigned_doctor_id = assigned_doctor['id']
+        assigned_doctor['assignedPatients'].append(patient['id'])
+
+        # Update the patient record
+        patient['severity'] = severity
+        patient['explanation'] = explanation
+        patient['assignedDoctor'] = assigned_doctor_id
+
+        # Save updated data
+        save_json(doctors, DOCTORS_FILE)
+        return assigned_doctor
+    else:
+        return None
+
+# Automatically assign new patients when they are added
+@app.route('/add-patient', methods=['POST'])
+def add_patient():
     data = request.json
+    patients = load_json(PATIENTS_FILE)
 
-    # Construct data string for response (mocking your Cerebras call)
-    parsed_data = f"There is a new patient named {data['name']} who is {data['age']} years old. The person's symptoms are {data['symptoms']} and their pain level is {data['painLevel']}. Additional Info: {data['additionalInfo']}"
-
-    # Mocking a severity score, replace with actual AI call if necessary
-    severity = "3"
-    explanation = "Moderate condition based on symptoms."
-
-    # Load patients from JSON
-    patients = load_patients()
-
-    # Add new patient data
+    # Add the new patient to the list
     new_patient = {
-        "id": len(patients) + 1,  # Simple auto-increment ID
+        "id": str(len(patients) + 1),
         "name": data['name'],
         "age": data['age'],
         "symptoms": data['symptoms'],
         "painLevel": data['painLevel'],
-        "additionalInfo": data['additionalInfo'],
-        "severity": severity,
-        "explanation": explanation,
-        "status": "waiting"
+        "severity": None,
+        "explanation": None,
+        "assignedDoctor": None
     }
     patients.append(new_patient)
 
-    # Save updated patients to JSON
-    save_patients(patients)
+    # Assign a doctor to the new patient automatically
+    assigned_doctor = auto_assign_doctor(new_patient)
 
-    return jsonify({"message": "Data received", "Summary": [severity, explanation]}), 200
+    # Save the updated patient list
+    save_json(patients, PATIENTS_FILE)
 
-
-# API to get live patient data for the doctor portal
-@app.route('/patients', methods=['GET'])
-def get_patients():
-    # Load patients from JSON
-    patients = load_patients()
-
-    # Filter patients by status 'waiting'
-    waiting_patients = [p for p in patients if p["status"] == "waiting"]
-    sorted_patients = sorted(waiting_patients, key=lambda p: int(p['severity']), reverse=True)
-
-    return jsonify({"patients": sorted_patients})
-
-
-# API for doctor to mark patient as 'seen'
-@app.route('/mark-seen/<int:patient_id>', methods=['POST'])
-def mark_seen(patient_id):
-    # Load patients from JSON
-    patients = load_patients()
-
-    # Find patient by ID and update status to 'seen'
-    for patient in patients:
-        if patient["id"] == patient_id:
-            patient["status"] = "seen"
-            break
+    if assigned_doctor:
+        return jsonify({"message": f"Patient assigned to Dr. {assigned_doctor['name']}"}), 200
     else:
-        return jsonify({"error": "Patient not found"}), 404
+        return jsonify({"message": "No doctors available at the moment"}), 200
 
-    # Save updated patients to JSON
-    save_patients(patients)
+# Load doctors and patients
+@app.route('/load-data', methods=['GET'])
+def load_data():
+    patients = load_json(PATIENTS_FILE)
+    doctors = load_json(DOCTORS_FILE)
+    return jsonify({"patients": patients, "doctors": doctors})
 
-    return jsonify({"message": "Patient marked as seen"})
+# Reassign a patient to a different doctor manually (Nurse override)
+@app.route('/assign-patient', methods=['POST'])
+def assign_patient():
+    data = request.json
+    patient_id = data['patientId']
+    doctor_id = data['doctorId']
 
+    # Load current data
+    patients = load_json(PATIENTS_FILE)
+    doctors = load_json(DOCTORS_FILE)
 
-# API to fetch seen patients
-@app.route('/seen-patients', methods=['GET'])
-def get_seen_patients():
-    # Load patients from JSON
-    patients = load_patients()
+    # Find the patient and doctor
+    patient = next((p for p in patients if p['id'] == patient_id), None)
+    doctor = next((d for d in doctors if d['id'] == doctor_id), None)
 
-    # Filter patients by status 'seen'
-    seen_patients = [p for p in patients if p["status"] == "seen"]
-    
-    return jsonify({"seen_patients": seen_patients})
+    if patient and doctor:
+        # Check if the doctor is already assigned to 2 patients
+        if len(doctor['assignedPatients']) >= 2:
+            return jsonify({"error": "Doctor is at capacity"}), 400
 
+        # Assign patient to doctor
+        doctor['assignedPatients'].append(patient_id)
+        patient['assignedDoctor'] = doctor_id
+
+        # Save updated data
+        save_json(patients, PATIENTS_FILE)
+        save_json(doctors, DOCTORS_FILE)
+
+        return jsonify({"message": "Patient reassigned to doctor"}), 200
+    else:
+        return jsonify({"error": "Patient or doctor not found"}), 404
 
 if __name__ == '__main__':
     app.run(debug=True)

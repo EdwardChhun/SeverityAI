@@ -1,0 +1,206 @@
+[
+    {
+        "id": "1",
+        "name": "Dr. Alice Brown",
+        "specialty": "General Practitioner",
+        "assignedPatients": [
+            "1",
+            "3"
+        ]
+    },
+    {
+        "id": "2",
+        "name": "Dr. Bob Smith",
+        "specialty": "Cardiologist",
+        "assignedPatients": [
+            "4",
+            "9"
+        ]
+    },
+    {
+        "id": "3",
+        "name": "Dr. Jane Williams",
+        "specialty": "Pulmonologist",
+        "assignedPatients": [
+            "5",
+            "7"
+        ]
+    },
+    {
+        "id": "4",
+        "name": "Dr. Michael Johnson",
+        "specialty": "Orthopedic Surgeon",
+        "assignedPatients": [
+            "2",
+            "10"
+        ]
+    },
+    {
+        "id": "5",
+        "name": "Dr. Sarah Lee",
+        "specialty": "Neurologist",
+        "assignedPatients": [
+            "8",
+            "13"
+        ]
+    },
+    {
+        "id": "6",
+        "name": "Dr. Emily Davis",
+        "specialty": "Trauma Surgeon",
+        "assignedPatients": [
+            "6",
+            "14"
+        ]
+    },
+    {
+        "id": "7",
+        "name": "Dr. Robert Clark",
+        "specialty": "Dermatologist",
+        "assignedPatients": [
+            "15",
+            "12"
+        ]
+    },
+    {
+        "id": "8",
+        "name": "Dr. Linda Harris",
+        "specialty": "Endocrinologist",
+        "assignedPatients": [
+            "11",
+            "11"
+        ]
+    },
+    {
+        "id": "9",
+        "name": "Dr. James Anderson",
+        "specialty": "Oncologist",
+        "assignedPatients": []
+    },
+    {
+        "id": "10",
+        "name": "Dr. Karen Martinez",
+        "specialty": "Infectious Disease Specialist",
+        "assignedPatients": []
+    },
+    {
+        "id": "11",
+        "name": "Dr. Andrew Thompson",
+        "specialty": "Gastroenterologist",
+        "assignedPatients": []
+    },
+    {
+        "id": "12",
+        "name": "Dr. Barbara Nelson",
+        "specialty": "Rheumatologist",
+        "assignedPatients": []
+    },
+    {
+        "id": "13",
+        "name": "Dr. Richard Moore",
+        "specialty": "Urologist",
+        "assignedPatients": []
+    },
+    {
+        "id": "14",
+        "name": "Dr. Patricia King",
+        "specialty": "Ophthalmologist",
+        "assignedPatients": []
+    },
+    {
+        "id": "15",
+        "name": "Dr. William Garcia",
+        "specialty": "Nephrologist",
+        "assignedPatients": []
+    },
+    {
+        "id": "16",
+        "name": "Dr. Laura White",
+        "specialty": "Obstetrician-Gynecologist (OB-GYN)",
+        "assignedPatients": []
+    },
+    {
+        "id": "17",
+        "name": "Dr. Thomas Young",
+        "specialty": "Pediatrician",
+        "assignedPatients": []
+    },
+    {
+        "id": "18",
+        "name": "Dr. Jennifer Wright",
+        "specialty": "Allergist/Immunologist",
+        "assignedPatients": []
+    },
+    {
+        "id": "19",
+        "name": "Dr. George Hall",
+        "specialty": "Psychiatrist",
+        "assignedPatients": []
+    },
+    {
+        "id": "20",
+        "name": "Dr. Nancy Scott",
+        "specialty": "Pain Management Specialist",
+        "assignedPatients": []
+    },
+    {
+        "id": "21",
+        "name": "Dr. Kevin Adams",
+        "specialty": "Hematologist",
+        "assignedPatients": []
+    },
+    {
+        "id": "22",
+        "name": "Dr. Paul Walker",
+        "specialty": "Plastic Surgeon",
+        "assignedPatients": []
+    },
+    {
+        "id": "23",
+        "name": "Dr. Donna Baker",
+        "specialty": "Pulmonologist",
+        "assignedPatients": []
+    },
+    {
+        "id": "24",
+        "name": "Dr. Steven Green",
+        "specialty": "Cardiothoracic Surgeon",
+        "assignedPatients": []
+    },
+    {
+        "id": "25",
+        "name": "Dr. Lisa Baker",
+        "specialty": "Orthopedic Surgeon",
+        "assignedPatients": []
+    },
+    {
+        "id": "26",
+        "name": "Dr. David Collins",
+        "specialty": "Neurosurgeon",
+        "assignedPatients": []
+    },
+    {
+        "id": "27",
+        "name": "Dr. Charles Parker",
+        "specialty": "Vascular Surgeon",
+        "assignedPatients": []
+    },
+    {
+        "id": "28",
+        "name": "Dr. Betty Phillips",
+        "specialty": "Hepatologist",
+        "assignedPatients": []
+    },
+    {
+        "id": "29",
+        "name": "Dr. Angela Turner",
+        "specialty": "Infectious Disease Specialist",
+        "assignedPatients": []
+    },
+    {
+        "id": "30",
+        "name": "Dr. Brian Hill",
+        "specialty": "Family Medicine",
+        "assignedPatients": []
+    }
+]

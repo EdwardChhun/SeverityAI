@@ -1,7 +1,7 @@
 import React from 'react';
 import { Route, Routes, Navigate } from 'react-router-dom';
 import EmergencyRoomForm from './components/EmergencyRoomForm';
-import DoctorsDashboard from './components/DoctorsDashboard';
+import NurseDashboard from './components/NurseDashboard';
 import { useAuthInfo, useRedirectFunctions } from '@propelauth/react';
 
 const ProtectedRoute = ({ children }) => {
@@ -28,7 +28,7 @@ const AppRoutes = () => {
         path="/doctor-portal" 
         element={
           <ProtectedRoute>
-            <DoctorsDashboard />
+            <NurseDashboard />
           </ProtectedRoute>
         } 
       />
