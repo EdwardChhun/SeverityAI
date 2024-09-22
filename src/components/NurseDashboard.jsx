@@ -43,6 +43,11 @@ const NurseDashboard = () => {
 
   // Assign a patient to a doctor
   const handleAssignPatient = async (patientId, doctorId) => {
+    if (!doctorId) {
+      console.error('No doctor selected.');
+      return;
+    }
+
     try {
       const response = await axios.post('http://127.0.0.1:5000/assign-patient', { patientId, doctorId });
       if (response.status === 200) {
@@ -104,8 +109,8 @@ const NurseDashboard = () => {
                   <td>
                     {!patient.assignedDoctor ? (
                       <select
-                        onChange={(e) => handleAssignPatient(patient.id, e.target.value)}
-                        value={selectedDoctor}
+                        onChange={(e) => {setSelectedDoctor(e.target.value); console.log(e.target.value)}} // Set the selected doctor
+                        value={selectedDoctor || ""}
                         className="doctor-select"
                       >
                         <option value="" disabled>Select a Doctor</option>
@@ -120,9 +125,9 @@ const NurseDashboard = () => {
                     ) : (
                       <button
                         className="reassign-btn"
-                        onClick={() => handleAssignPatient(patient.id, selectedDoctor)}
+                        onClick={() => handleAssignPatient(patient.id, selectedDoctor)} // Assign the selected doctor
                       >
-                        Reassign Doctor
+                        Assign Doctor
                       </button>
                     )}
                   </td>

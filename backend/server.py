@@ -2,17 +2,16 @@ import os
 import json
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-from cerebrasAPI import cerebrasINF
+from cerebrasAPI import cerebrasAssignDoctor
 
-# Initialize the Flask app and enable CORS
 app = Flask(__name__)
 CORS(app)
 
-# Path to the JSON files
+# Paths to the JSON files
 PATIENTS_FILE = os.path.join(os.getcwd(), "patients.json")
 DOCTORS_FILE = os.path.join(os.getcwd(), "doctors.json")
 
-# Helper functions to interact with JSON files
+# Helper functions
 def load_json(file_path):
     if not os.path.exists(file_path):
         return []
@@ -23,41 +22,35 @@ def save_json(data, file_path):
     with open(file_path, "w") as file:
         json.dump(data, file, indent=4)
 
-# Auto-assign a patient based on AI evaluation
+# Auto-assign a doctor based on AI evaluation
 def auto_assign_doctor(patient):
     doctors = load_json(DOCTORS_FILE)
 
-    # Get the patient details as input for the AI
-    patient_info = f"There is a patient named {patient['name']} who is {patient['age']} years old. They are experiencing {patient['symptoms']} with a pain level of {patient['painLevel']}."
-
-    # Call the AI to rank severity
-    ai_response = cerebrasINF(patient_info)
+    # Prepare patient info for AI
+    patient_info = f"Patient {patient['name']}, age {patient['age']} with symptoms: {patient['symptoms']} and a pain level of {patient['painLevel']}."
     
-    output_message = []
-    for chunk in ai_response:
-        content = chunk.choices[0].delta.content
-        if content:
-            output_message.append(content)
+    # Prepare doctor info for AI
+    doctors_info = ", ".join([f"Dr. {doc['name']} ({doc['specialty']}, {len(doc['assignedPatients'])}/2 patients)" for doc in doctors])
+
+    # Get AI's recommendation for severity and doctor assignment
+    ai_response = cerebrasAssignDoctor(patient_info, doctors_info)
     
-    full_message = ''.join(output_message)
-    severity = int(full_message[0])  # Extract the severity score
-    explanation = full_message[3:]
+    # Extract severity and doctor recommendation from AI response
+    severity = int(ai_response[0])  # Get severity as the first character (assuming it's a number)
+    explanation = ai_response.split('\n')[0][3:]  # Rest of the line after severity
+    assigned_doctor_name = ai_response.split('Assigned Doctor: ')[1].strip()
 
-    # Find an available doctor in the doctors.json list
-    available_doctors = [doc for doc in doctors if len(doc.get('assignedPatients', [])) < 2]
+    # Find the doctor recommended by the AI
+    assigned_doctor = next((doc for doc in doctors if doc['name'] == assigned_doctor_name), None)
 
-    if available_doctors:
-        # Auto-assign the first available doctor in the list
-        assigned_doctor = available_doctors[0]
-        assigned_doctor_id = assigned_doctor['id']
+    if assigned_doctor and len(assigned_doctor.get('assignedPatients', [])) < 2:
+        # Assign the patient to the doctor
         assigned_doctor['assignedPatients'].append(patient['id'])
-
-        # Update the patient record
         patient['severity'] = severity
         patient['explanation'] = explanation
-        patient['assignedDoctor'] = assigned_doctor_id
+        patient['assignedDoctor'] = assigned_doctor['id']
 
-        # Save updated data
+        # Save the updated patient and doctor data
         save_json(doctors, DOCTORS_FILE)
         return assigned_doctor
     else:
@@ -82,7 +75,7 @@ def add_patient():
     }
     patients.append(new_patient)
 
-    # Assign a doctor to the new patient automatically
+    # Auto-assign a doctor using AI
     assigned_doctor = auto_assign_doctor(new_patient)
 
     # Save the updated patient list
@@ -105,7 +98,7 @@ def load_data():
 def assign_patient():
     data = request.json
     patient_id = data['patientId']
-    doctor_id = data['doctorId']
+    doctor_id = data['DoctorId']
 
     # Load current data
     patients = load_json(PATIENTS_FILE)
