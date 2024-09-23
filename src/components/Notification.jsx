@@ -7,7 +7,7 @@ const Notification = ({ message }) => {
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsVisible(true);
-    }, 15000);
+    }, 35000);
 
     return () => clearTimeout(timer);
   }, []);

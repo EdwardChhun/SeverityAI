@@ -40,7 +40,7 @@ function App() {
             className="doctor-login-button" 
             onClick={handleDoctorLogin}
           >
-            Sign in as Doctor
+            {/* Sign in as Doctor */}
           </button>
         )}
 
