@@ -1,7 +1,7 @@
 ## Demo Video
 Click on the image below to see the demo video!
 
-[![Demo Video!](https://img.youtube.com/vi/4-_6q-zsYQo/0.jpg)](https://www.youtube.com/watch?v=4-_6q-zsYQo)
+[![Demo Video!](https://img.youtube.com/vi/4-_6q-zsYQo/0.jpg)](https://www.youtube.com/watch?v=4-_6q-zsYQo target="_blank")
  
  ## Inspiration
 
