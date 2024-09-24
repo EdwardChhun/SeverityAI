@@ -1,9 +1,5 @@
-## Demo Video
-Click on the image below to see the demo video!
-
-[![Demo Video!](https://img.youtube.com/vi/4-_6q-zsYQo/0.jpg)](https://www.youtube.com/watch?v=4-_6q-zsYQo)
- 
- ## Inspiration
+# Severity AI | PennApps XXI Hackathon - [Demo Video ](https://www.youtube.com/watch?v=4-_6q-zsYQo) / [Devpost](https://devpost.com/software/severityai?ref_content=user-portfolio&ref_feature=in_progress)
+## Inspiration
 
 The inspiration for SeverityAI came from a personal experience that one of our team members had last year. After experiencing heart palpitations, he had to visit the emergency room, only to be shocked by the overwhelming number of patients—some bloody, others coughing heavily. Seeing over a hundred people waiting in discomfort made him realize just how inadequate the current emergency room management system is in handling patient flow and prioritization.
 
