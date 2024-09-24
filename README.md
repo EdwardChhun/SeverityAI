@@ -9,11 +9,17 @@ By addressing these challenges, we hope to make a real-world impact on emergency
 
 ## What it does
 
-__Emergency Room Triage Workflow__  
-![User_workflow](./public/user_workflow.png)
+__Emergency Room Triage Workflow__ <br/>
 
-__Management Dashboard Software for Nurses with Classified Severity__  
-![Dashboard_Nurse](./public/image.png)
+![User_workflow](./public/media/ER_Patient_Workflow.png)
+
+__Management Dashboard Software for Nurses with Classified Severity__ <br/>
+
+![Dashboard_Nurse](./public/media/Nurse_Dashbaord.png)
+
+__Doctor Assignments / Overrides__ <br/>
+
+![Doctor Assignments](./public/media/Doctor_Assignment.png)
 
 Our mobile app allows patients to quickly describe their symptoms, rate their pain, and provide basic personal information such as age and name. An AI-powered model then evaluates this input and assigns each patient a rating from 1 to 5, indicating the urgency of their care needs. Patients with critical conditions are prioritized, while those with less immediate concerns can safely wait longer without risk of complications.
 
@@ -68,7 +74,7 @@ def chatbot():
 On the frontend, we used _React.js_, _HTML5_, and _CSS_ to create a user-friendly interface for both patients and healthcare providers. The database is built using _JSON_, which stores information about both patients and available doctors, enabling real-time updates. _Propel Authentication_ was implemented to securely manage admin logins, ensuring that only authorized personnel can access patient submissions.
 
 __PropelAuth / GitHub OAuth__
-![propel_auth](./public/auth.png)
+![propel_auth](./public/media/Auth.png)
 
 This combination of technologies allowed us to create a robust and scalable solution to improve emergency room efficiency.
 
